@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle — ไพ่ทาโรต์</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=Sarabun:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#06030f;
+  --plum:#110820;
+  --chamber:#1a0d2e;
+  --ritual:#2d1b4e;
+  --gold:#c9a96e;
+  --gold-pale:#e8d5a3;
+  --gold-dark:#8a6a38;
+}
+html,body{height:100%;overflow:hidden;background:var(--void);font-family:'Cinzel',serif}
+
+/* ── STARS (พื้นหลัง, ไม่บัง click) ── */
+#star-layer{
+  position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
+}
+.star{
+  position:absolute;pointer-events:none;
+  animation:twinkle var(--d,3s) ease-in-out infinite var(--dl,0s);
+}
+.star::before,.star::after{
+  content:'';position:absolute;background:var(--gold-pale);border-radius:99px;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+}
+.star::before{width:100%;height:22%}
+.star::after{width:22%;height:100%}
+.star .glow{
+  position:absolute;inset:-80%;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,213,163,.3) 0%,transparent 70%);
+}
+@keyframes twinkle{
+  0%,100%{opacity:.12;transform:scale(.9) rotate(0deg)}
+  50%{opacity:var(--op,1);transform:scale(1.1) rotate(8deg)}
+}
+
+/* ── FLASH ── */
+#flash{
+  position:fixed;inset:0;z-index:9999;background:rgba(255,220,100,0);
+  pointer-events:none;transition:background .15s;
+}
+#flash.on{background:rgba(255,220,100,.65)}
+
+/* ── LANDING ── */
+#landing{
+  position:fixed;inset:0;z-index:500;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,#1a0d2e,var(--void) 70%);
+  display:flex;flex-direction:column;align-items:center;padding-top:0;
+  cursor:pointer;overflow:hidden;
+  transition:opacity .8s ease,transform .8s ease;
+}
+#landing.gone{opacity:0;pointer-events:none !important;touch-action:none;transform:scale(1.05)}
+
+.ceiling{width:100%;height:6px;background:linear-gradient(90deg,transparent 15%,#5a4020 50%,transparent 85%)}
+
+.rope-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  transform-origin:top center;
+  animation:idle 3s ease-in-out infinite;
+}
+@keyframes idle{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+.rope-wrap.pull{animation:pull .45s ease-out forwards}
+@keyframes pull{40%{transform:translateY(55px) rotate(2deg)}100%{transform:translateY(45px) rotate(0deg)}}
+
+.rope{width:8px;background:repeating-linear-gradient(170deg,#6b4c2a 0,#8a6234 3px,#5a3d1e 6px,#7a5a30 9px);border-radius:4px;box-shadow:inset -2px 0 4px rgba(0,0,0,.4)}
+.knot{width:20px;height:14px;background:radial-gradient(ellipse,#9a7040,#6b4c2a);border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.hook{width:24px;height:16px;border:3px solid #6b4c2a;border-bottom:none;border-radius:12px 12px 0 0;margin-bottom:-2px}
+
+.lantern{display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 0 28px rgba(255,180,60,.45));transition:filter .15s}
+.lantern.lit{filter:drop-shadow(0 0 60px rgba(255,220,100,.95)) drop-shadow(0 0 120px rgba(255,140,30,.6))}
+.l-top{width:50px;height:14px;background:linear-gradient(135deg,#8a6234,#5a3d1e,#8a6234);border-radius:4px 4px 0 0;border:1px solid #6b4c2a}
+.l-body{
+  width:70px;height:100px;border:2px solid #8a6234;border-radius:6px;
+  background:linear-gradient(135deg,rgba(255,180,60,.13),rgba(255,140,20,.07));
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+}
+.l-body::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,#8a623418 0,#8a623418 1px,transparent 1px,transparent 16px),
+             repeating-linear-gradient(0deg,#8a623418 0,#8a623418 1px,transparent 1px,transparent 16px);
+}
+.l-flame{font-size:2rem;z-index:1;animation:flicker 1.5s ease-in-out infinite alternate}
+@keyframes flicker{0%{opacity:.7;transform:scale(.88)}100%{opacity:1;transform:scale(1.1)}}
+.l-base{width:50px;height:10px;background:linear-gradient(135deg,#8a6234,#5a3d1e);border-radius:0 0 4px 4px}
+
+.l-title{font-family:'Cinzel Decorative',serif;font-size:clamp(1.4rem,5vw,2.8rem);color:var(--gold-pale);letter-spacing:.15em;margin-top:3rem;text-shadow:0 0 40px rgba(201,169,110,.35)}
+.l-sub{font-family:'Sarabun',sans-serif;font-weight:300;font-size:.9rem;color:rgba(201,169,110,.55);letter-spacing:.2em;margin-top:.4rem}
+.l-hint{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.28em;color:var(--gold);margin-top:2rem;animation:blink 2.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.35}50%{opacity:.85}}
+
+/* ── APP ── */
+#app{
+  position:fixed;inset:0;z-index:1;
+  background:radial-gradient(ellipse 100% 80% at 50% 100%,#2d1b4e,#110820 40%,var(--void));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 1s ease .35s;overflow:hidden;
+}
+#app.on{opacity:1;pointer-events:all}
+
+.app-title{font-family:'Cinzel Decorative',serif;font-size:clamp(1rem,3vw,1.6rem);color:var(--gold);letter-spacing:.2em;text-align:center;text-shadow:0 0 30px rgba(201,169,110,.3);margin-bottom:.2rem}
+.app-sub{font-family:'Sarabun',sans-serif;font-weight:300;font-size:.72rem;color:rgba(201,169,110,.45);letter-spacing:.25em;text-align:center;margin-bottom:2rem}
+
+/* ── TABLE ── */
+.stage{display:flex;align-items:center;justify-content:center;gap:2.5rem;width:100%;max-width:900px;padding:0 1.5rem;position:relative;z-index:10}
+
+.tbl{position:relative;width:clamp(240px,38vw,400px);aspect-ratio:1;flex-shrink:0}
+.tbl-surf{
+  width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(ellipse 60% 30% at 35% 25%,rgba(255,255,255,.06),transparent 60%),
+             radial-gradient(ellipse 100% 100% at 50% 50%,#3d2810,#2a1c0a 50%,#1a1008);
+  border:6px solid #6b4c2a;
+  box-shadow:0 0 0 2px #8a6234,0 0 0 8px #3d2810,0 20px 60px rgba(0,0,0,.8),inset 0 2px 20px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+}
+.tbl-surf::before{content:'';position:absolute;inset:8%;border:1px solid rgba(201,169,110,.12);border-radius:50%}
+.tbl-surf::after{content:'';position:absolute;inset:15%;border:1px solid rgba(201,169,110,.06);border-radius:50%}
+
+.candle{position:absolute;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.c-flame{font-size:.9rem;animation:flicker 1.2s ease-in-out infinite alternate;line-height:1}
+.c-body{width:9px;height:28px;background:linear-gradient(180deg,#f0e6c8,#d4c4a0);border-radius:2px;box-shadow:0 0 12px rgba(255,200,80,.28)}
+.c1{bottom:14%;left:11%;transform:rotate(-5deg)}
+.c2{bottom:9%;right:14%;transform:rotate(3deg)}
+.c3{top:11%;left:17%;transform:rotate(2deg)}
+
+/* deck on table */
+.deck-zone{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  cursor:pointer;transition:transform .25s;z-index:20;
+  -webkit-tap-highlight-color:transparent;
+}
+.deck-zone:hover,.deck-zone:active{transform:translate(-50%,-50%) scale(1.06)}
+.deck-stack{position:relative;width:68px;height:106px}
+.dc{
+  position:absolute;width:66px;height:104px;
+  background:linear-gradient(135deg,#1a0d2e,#2d1b4e);
+  border:2px solid var(--gold-dark);border-radius:5px;
+  box-shadow:2px 2px 6px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;color:rgba(201,169,110,.25);
+}
+.dc:nth-child(1){top:4px;left:2px;transform:rotate(-2deg)}
+.dc:nth-child(2){top:2px;left:1px;transform:rotate(-1deg)}
+.dc:nth-child(3){top:0;left:0}
+.deck-lbl{font-size:.62rem;letter-spacing:.18em;color:rgba(201,169,110,.55)}
+
+/* ── PANEL ── */
+.panel{
+  flex:1;max-width:320px;min-height:360px;
+  background:linear-gradient(160deg,rgba(26,13,46,.97),rgba(17,8,32,.99));
+  border:1px solid rgba(201,169,110,.18);border-radius:3px;padding:1.4rem;
+  display:flex;flex-direction:column;position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(201,169,110,.08);
+  opacity:0;transform:translateX(18px);transition:opacity .55s ease,transform .55s ease;
+}
+.panel::before{content:'';position:absolute;top:0;left:1.4rem;right:1.4rem;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.panel.on{opacity:1;transform:translateX(0)}
+
+.p-idle{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:.8rem;text-align:center}
+.p-icon{font-size:1.8rem;opacity:.35}
+.p-txt{font-family:'Sarabun',sans-serif;font-weight:300;font-size:.82rem;color:rgba(201,169,110,.48);line-height:1.9;letter-spacing:.05em}
+
+.p-result{display:none;flex-direction:column;gap:.9rem;height:100%}
+.p-result.on{display:flex}
+
+.card-wrap{display:flex;justify-content:center;perspective:600px}
+.card-3d{
+  width:86px;height:134px;transform-style:preserve-3d;
+  animation:cflip .85s ease-out forwards;
+}
+@keyframes cflip{0%{transform:rotateY(180deg) scale(.8)}60%{transform:rotateY(-8deg) scale(1.04)}100%{transform:rotateY(0) scale(1)}}
+.cf,.cb{position:absolute;inset:0;backface-visibility:hidden;border-radius:6px;border:2px solid var(--gold-dark);display:flex;align-items:center;justify-content:center}
+.cf{background:linear-gradient(160deg,#f0e6c8,#e0d0a8);flex-direction:column;gap:.2rem;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 18px rgba(201,169,110,.25)}
+.cb{background:linear-gradient(135deg,#1a0d2e,#2d1b4e);transform:rotateY(180deg)}
+.cb::after{content:'✦';color:rgba(201,169,110,.25);font-size:1.8rem}
+.c-num{font-size:.55rem;letter-spacing:.14em;color:var(--gold-dark)}
+.c-emoji{font-size:2.2rem}
+
+.c-name{font-family:'Cinzel',serif;font-weight:600;font-size:.95rem;color:var(--gold-pale);letter-spacing:.1em;text-align:center;line-height:1.3;text-shadow:0 0 18px rgba(201,169,110,.25)}
+.c-name-th{font-family:'Sarabun',sans-serif;font-weight:300;font-size:.76rem;color:rgba(201,169,110,.55);text-align:center;letter-spacing:.08em}
+.c-div{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.25),transparent)}
+.c-mean{font-family:'Sarabun',sans-serif;font-weight:300;font-size:.8rem;line-height:1.95;color:rgba(232,213,163,.78);flex:1;overflow-y:auto}
+.c-mean::-webkit-scrollbar{width:2px}
+.c-mean::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:2px}
+
+.btn-again{margin-top:.8rem;font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.18em;color:rgba(201,169,110,.5);background:transparent;border:1px solid rgba(201,169,110,.15);padding:.45rem 1.4rem;cursor:pointer;transition:all .25s;display:none;width:100%}
+.btn-again.on{display:block}
+.btn-again:hover{color:var(--gold);border-color:rgba(201,169,110,.3)}
+
+/* ── OVERLAY ── */
+#ov{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(6,3,15,.92);backdrop-filter:blur(5px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.8rem;
+}
+#ov.on{display:flex}
+.ov-deck{position:relative;width:88px;height:138px;cursor:pointer;transition:transform .25s}
+.ov-deck:hover{transform:scale(1.04)}
+.odc{position:absolute;width:84px;height:132px;background:linear-gradient(135deg,#1a0d2e,#2d1b4e);border:2px solid var(--gold-dark);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:rgba(201,169,110,.22);box-shadow:2px 2px 8px rgba(0,0,0,.5)}
+.odc:nth-child(1){top:4px;left:2px;transform:rotate(-2deg)}
+.odc:nth-child(2){top:2px;left:1px;transform:rotate(-1deg)}
+.odc:nth-child(3){top:0;left:0}
+.ov-hint{font-family:'Sarabun',sans-serif;font-weight:300;font-size:.8rem;color:rgba(201,169,110,.5);letter-spacing:.15em}
+.sc{position:absolute;top:0;left:0;width:84px;height:132px;background:linear-gradient(135deg,#1a0d2e,#2d1b4e);border:2px solid var(--gold-dark);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:rgba(201,169,110,.22);animation:sa .42s ease-in-out forwards}
+@keyframes sa{0%{transform:translate(0,0) rotate(0)}35%{transform:translate(var(--tx,55px),var(--ty,-28px)) rotate(var(--r,14deg))}70%{transform:translate(var(--tx2,-38px),var(--ty2,18px)) rotate(var(--r2,-9deg))}100%{transform:translate(0,0) rotate(0)}}
+
+.btn-sh,.btn-dr{font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.2em;color:var(--gold);background:transparent;border:1px solid rgba(201,169,110,.35);padding:.72rem 1.9rem;cursor:pointer;transition:all .25s;-webkit-tap-highlight-color:transparent}
+.btn-sh:hover,.btn-dr:hover{border-color:var(--gold);box-shadow:0 0 18px rgba(201,169,110,.18)}
+.btn-dr{color:var(--gold-pale);border-color:var(--gold);font-size:.88rem}
+
+.rune{position:fixed;font-family:'Cinzel',serif;color:rgba(201,169,110,.055);pointer-events:none;z-index:0;animation:rp 5s ease-in-out infinite var(--dl,0s)}
+@keyframes rp{0%,100%{opacity:.03}50%{opacity:.09}}
+</style>
+</head>
+<body>
+
+<div id="flash"></div>
+<div id="star-layer"></div>
+
+<div class="rune" style="top:18%;left:6%;font-size:2rem;--dl:0s">ᚱ</div>
+<div class="rune" style="top:10%;right:7%;font-size:1.6rem;--dl:1.5s">ᛟ</div>
+<div class="rune" style="bottom:12%;left:8%;font-size:1.9rem;--dl:1s">ᛉ</div>
+<div class="rune" style="bottom:9%;right:6%;font-size:1.5rem;--dl:2.5s">ᚹ</div>
+<div class="rune" style="top:50%;left:3%;font-size:1.4rem;--dl:3s">ᛗ</div>
+<div class="rune" style="top:55%;right:4%;font-size:1.4rem;--dl:.8s">ᚷ</div>
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="ceiling"></div>
+  <div class="l-title">O R A C L E</div>
+  <div class="l-sub">ไพ่ทาโรต์แห่งโชคชะตา</div>
+  <div style="margin-top:2.5rem;display:flex;flex-direction:column;align-items:center">
+    <div id="rope" class="rope-wrap">
+      <div class="hook"></div>
+      <div class="rope" style="height:150px"></div>
+      <div class="knot"></div>
+      <div class="rope" style="height:70px"></div>
+      <div class="lantern" id="lantern">
+        <div class="l-top"></div>
+        <div class="l-body"><div class="l-flame">🕯</div></div>
+        <div class="l-base"></div>
+      </div>
+    </div>
+  </div>
+  <div class="l-hint">ดึงหรือคลิกโคมไฟเพื่อเปิดประตู</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="app-title">ห้องแห่งโชคชะตา</div>
+  <div class="app-sub">CHAMBER OF FATE</div>
+  <div class="stage">
+    <div class="tbl">
+      <div class="tbl-surf">
+        <div class="candle c1"><div class="c-flame">🔥</div><div class="c-body"></div></div>
+        <div class="candle c2"><div class="c-flame">🔥</div><div class="c-body"></div></div>
+        <div class="candle c3"><div class="c-flame">🔥</div><div class="c-body"></div></div>
+        <div class="deck-zone" id="deckZone">
+          <div class="deck-stack">
+            <div class="dc">✦</div><div class="dc">✦</div><div class="dc">✦</div>
+          </div>
+          <div class="deck-lbl">หยิบสำรับไพ่</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel" id="panel">
+      <div class="p-idle" id="pIdle">
+        <div class="p-icon">🔮</div>
+        <div class="p-txt">คลิกที่สำรับไพ่<br>เพื่อเริ่มต้นการทำนาย<br><br><span style="font-size:.68rem;opacity:.55;letter-spacing:.14em">THE CARDS AWAIT</span></div>
+      </div>
+      <div class="p-result" id="pResult">
+        <div class="card-wrap"><div class="card-3d" id="card3d"><div class="cf"><div class="c-num" id="cNum">0</div><div class="c-emoji" id="cEmoji">☀️</div></div><div class="cb"></div></div></div>
+        <div class="c-name" id="cName">THE FOOL</div>
+        <div class="c-name-th" id="cNameTh">คนโง่</div>
+        <div class="c-div"></div>
+        <div class="c-mean" id="cMean"></div>
+        <button class="btn-again" id="btnAgain" onclick="reset()">✦ ทำนายอีกครั้ง ✦</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div id="ov">
+  <div class="ov-hint" id="ovHint">สำรับไพ่อยู่ในมือคุณแล้ว</div>
+  <div class="ov-deck" id="ovDeck">
+    <div class="odc">✦</div><div class="odc">✦</div><div class="odc">✦</div>
+  </div>
+  <button class="btn-sh" id="btnSh" onclick="doShuffle()">✦ สับไพ่ ✦</button>
+  <button class="btn-dr" id="btnDr" style="display:none" onclick="doDraw()">จั่วไพ่</button>
+</div>
+
+<script>
+/* ── CARDS DATA ── */
+const CARDS=[
+  {n:'0',name:'THE FOOL',th:'คนโง่ / ผู้เริ่มต้น',e:'🃏',m:'จุดเริ่มต้นใหม่ อิสรเสรี การผจญภัย และความบริสุทธิ์ใจ คุณกำลังยืนอยู่บนขอบผา พร้อมจะกระโดดสู่สิ่งที่ยิ่งใหญ่กว่า จงเชื่อมั่นในสัญชาตญาณและอย่ากลัวที่จะเริ่มต้นใหม่'},
+  {n:'I',name:'THE MAGICIAN',th:'นักมายากล',e:'🪄',m:'พลังแห่งเจตจำนง ความสามารถ และการสร้างสรรค์ คุณมีทุกอย่างในมือแล้ว เพียงแต่รู้จักนำมาใช้ ช่วงเวลาที่ความคิดกลายเป็นความจริง'},
+  {n:'II',name:'THE HIGH PRIESTESS',th:'นักบวชหญิง',e:'🌙',m:'สัญชาตญาณ ความลึกลับ ปัญญาภายใน เวลาหันเข้าหาตัวเองและฟังเสียงจากภายใน ความรู้สึกของคุณไม่โกหก'},
+  {n:'III',name:'THE EMPRESS',th:'จักรพรรดินี',e:'👑',m:'ความอุดมสมบูรณ์ ความงาม และธรรมชาติ ช่วงเวลาแห่งการเติบโตและผลิดอกออกผล ความรักกำลังไหลเวียนรอบตัวคุณ'},
+  {n:'IV',name:'THE EMPEROR',th:'จักรพรรดิ',e:'⚔️',m:'อำนาจ ความมั่นคง โครงสร้าง ถึงเวลายืนหยัดและสร้างรากฐานที่แข็งแกร่ง ความเป็นผู้นำจะนำคุณไปสู่ความสำเร็จ'},
+  {n:'V',name:'THE HIEROPHANT',th:'นักบวชสูงสุด',e:'🏛️',m:'ประเพณี ความเชื่อ และการแนะแนว มีบทเรียนสำคัญรอให้เรียนรู้ การปฏิบัติตามหลักธรรมจะเป็นแสงสว่างในยามนี้'},
+  {n:'VI',name:'THE LOVERS',th:'คู่รัก',e:'💞',m:'ความรัก ความสัมพันธ์ และการเลือก ณ ทางสองแพร่ง คุณต้องตัดสินใจอย่างสำคัญ จงฟังใจตัวเอง'},
+  {n:'VII',name:'THE CHARIOT',th:'รถรบ',e:'🏆',m:'ชัยชนะ ความมุ่งมั่น และความกล้า คุณกำลังก้าวไปข้างหน้าด้วยพลัง ชัยชนะอยู่ไม่ไกลเกินเอื้อม'},
+  {n:'VIII',name:'STRENGTH',th:'ความแข็งแกร่ง',e:'🦁',m:'ความกล้า ความอดทน และพลังภายใน ความแข็งแกร่งแท้จริงมาจากความสงบและเมตตาธรรม'},
+  {n:'IX',name:'THE HERMIT',th:'ฤาษี',e:'🏮',m:'การหาคำตอบจากภายใน ความสงัด บางครั้งคำตอบอยู่ในความเงียบสงบของใจตัวเอง'},
+  {n:'X',name:'WHEEL OF FORTUNE',th:'วงล้อโชคชะตา',e:'🎡',m:'โชค การเปลี่ยนแปลง และวัฏจักร ชีวิตหมุนวนเสมอ จงตั้งรับการเปลี่ยนแปลงด้วยใจที่เปิดกว้าง'},
+  {n:'XI',name:'JUSTICE',th:'ความยุติธรรม',e:'⚖️',m:'ความยุติธรรม ความสมดุล และความจริง ทุกการกระทำมีผลตอบแทน ถึงเวลาพิจารณาด้วยความเป็นกลาง'},
+  {n:'XII',name:'THE HANGED MAN',th:'ชายที่ถูกแขวน',e:'🔄',m:'การยอมรับ การรอคอย การมองต่างมุม บางครั้งการหยุดนิ่งคือการกระทำที่ดีที่สุด'},
+  {n:'XIII',name:'DEATH',th:'การเปลี่ยนผ่าน',e:'🌑',m:'การสิ้นสุดของบทหนึ่งและการเริ่มต้นของบทใหม่ จงปล่อยวางในสิ่งที่ไม่อาจดำรงอยู่ได้อีกต่อไป'},
+  {n:'XIV',name:'TEMPERANCE',th:'ความพอดี',e:'🏺',m:'ความสมดุล ความอดทน และการปรับตัว ความยั่งยืนมาจากการผสมผสานที่ลงตัว'},
+  {n:'XV',name:'THE DEVIL',th:'ปีศาจ',e:'🔗',m:'การยึดติดและกับดักที่สร้างขึ้นเอง คุณอาจรู้สึกติดอยู่ แต่แท้จริงโซ่ตรวนอยู่ในใจ ถึงเวลาปลดปล่อยตัวเอง'},
+  {n:'XVI',name:'THE TOWER',th:'หอคอย',e:'⚡',m:'การพังทลายที่นำมาซึ่งการตื่นรู้ สิ่งที่สร้างบนรากฐานไม่มั่นคงย่อมพังทลาย แต่จากซากปรักหักพัง โอกาสใหม่จะปรากฏ'},
+  {n:'XVII',name:'THE STAR',th:'ดาว',e:'⭐',m:'ความหวัง การรักษา และแรงบันดาลใจ หลังความมืดมน แสงดาวยังส่องสว่าง จงไว้วางใจในจักรวาล ทุกอย่างจะดีขึ้น'},
+  {n:'XVIII',name:'THE MOON',th:'พระจันทร์',e:'🌕',m:'ภาพลวงตา ความลึกลับ และจิตใต้สำนึก สิ่งต่างๆ อาจไม่ได้เป็นอย่างที่มองเห็น จงเชื่อสัญชาตญาณ'},
+  {n:'XIX',name:'THE SUN',th:'พระอาทิตย์',e:'☀️',m:'ความสุข ความสำเร็จ และความมีชีวิตชีวา พลังงานบวกกำลังหลั่งไหลเข้ามา ความสำเร็จและความสุขกำลังรอคุณอยู่'},
+  {n:'XX',name:'JUDGEMENT',th:'วันพิพากษา',e:'📯',m:'การตื่นขึ้น การไถ่บาป ถึงเวลาประเมินชีวิตอีกครั้ง จงให้อภัยทั้งตัวเองและผู้อื่น การตื่นรู้ครั้งใหม่กำลังมาถึง'},
+  {n:'XXI',name:'THE WORLD',th:'โลก',e:'🌍',m:'การสำเร็จ ความสมบูรณ์ และการบูรณาการ คุณมาถึงจุดสุดยอดของการเดินทาง บทเรียนทั้งหมดได้รับการเรียนรู้แล้ว'}
+];
+
+/* ── STARS ── */
+(function(){
+  const sl=document.getElementById('star-layer');
+  const sizes=[[12,20,12],[5,10,28],[2,4,45]];
+  const ops=[1,.85,.6];
+  sizes.forEach(([mn,mx,cnt],ti)=>{
+    for(let i=0;i<cnt;i++){
+      const d=document.createElement('div');d.className='star';
+      const sz=mn+Math.random()*(mx-mn);
+      d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*95}%;left:${Math.random()*95}%;--d:${2+Math.random()*4}s;--dl:${Math.random()*6}s;--op:${ops[ti]}`;
+      if(ti<2){const g=document.createElement('div');g.className='glow';d.appendChild(g);}
+      sl.appendChild(d);
+    }
+  });
+})();
+
+/* ── STATE ── */
+let phase='idle';
+
+/* ── LANDING ── */
+(function(){
+  const landing=document.getElementById('landing');
+  const rope=document.getElementById('rope');
+  const lantern=document.getElementById('lantern');
+  const flash=document.getElementById('flash');
+  let done=false;
+
+  function enter(){
+    if(done)return;done=true;
+    rope.classList.add('pull');
+    lantern.classList.add('lit');
+    flash.classList.add('on');
+    setTimeout(()=>flash.classList.remove('on'),200);
+    setTimeout(()=>{
+      landing.classList.add('gone');
+      document.getElementById('app').classList.add('on');
+    },550);
+  }
+
+  // click anywhere on landing
+  landing.addEventListener('click',enter);
+
+  // drag rope down
+  let sy=0,drag=false;
+  rope.addEventListener('mousedown',e=>{sy=e.clientY;drag=true;e.stopPropagation()});
+  document.addEventListener('mousemove',e=>{if(drag&&e.clientY-sy>35)enter()});
+  document.addEventListener('mouseup',()=>drag=false);
+  rope.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;drag=true},{passive:true});
+  document.addEventListener('touchmove',e=>{if(drag&&e.touches[0].clientY-sy>35)enter()},{passive:true});
+  document.addEventListener('touchend',()=>drag=false);
+})();
+
+/* ── DECK CLICK ── */
+document.getElementById('deckZone').addEventListener('click',function(e){
+  e.stopPropagation();
+  if(phase!=='idle')return;
+  phase='ov';
+  document.getElementById('btnSh').style.display='';
+  document.getElementById('btnDr').style.display='none';
+  document.getElementById('ovHint').textContent='สำรับไพ่อยู่ในมือคุณแล้ว';
+  document.getElementById('ov').classList.add('on');
+});
+
+/* ── SHUFFLE ── */
+function doShuffle(){
+  phase='shuf';
+  document.getElementById('btnSh').style.display='none';
+  document.getElementById('ovHint').textContent='กำลังสับไพ่...';
+  const deck=document.getElementById('ovDeck');
+  const anims=[
+    {tx:'58px',ty:'-28px',r:'14deg',tx2:'-38px',ty2:'18px',r2:'-9deg'},
+    {tx:'-48px',ty:'-18px',r:'-12deg',tx2:'32px',ty2:'14px',r2:'8deg'},
+    {tx:'38px',ty:'24px',r:'19deg',tx2:'-28px',ty2:'-22px',r2:'-14deg'},
+  ];
+  let n=0;
+  anims.forEach((a,i)=>setTimeout(()=>{
+    const sc=document.createElement('div');sc.className='sc';sc.textContent='✦';
+    sc.style.setProperty('--tx',a.tx);sc.style.setProperty('--ty',a.ty);sc.style.setProperty('--r',a.r);
+    sc.style.setProperty('--tx2',a.tx2);sc.style.setProperty('--ty2',a.ty2);sc.style.setProperty('--r2',a.r2);
+    deck.appendChild(sc);
+    setTimeout(()=>{sc.remove();if(++n===3){phase='ready';document.getElementById('ovHint').textContent='จับสำรับไพ่ไว้แน่น... แล้วจั่ว';document.getElementById('btnDr').style.display=''}},450);
+  },i*200));
+}
+
+/* ── DRAW ── */
+function doDraw(){
+  if(phase!=='ready')return;
+  phase='drawn';
+  document.getElementById('ov').classList.remove('on');
+  const card=CARDS[Math.floor(Math.random()*CARDS.length)];
+  const panel=document.getElementById('panel');
+  panel.classList.add('on');
+  document.getElementById('pIdle').style.display='none';
+  const c3=document.getElementById('card3d');
+  c3.style.animation='none';c3.offsetHeight;c3.style.animation='';
+  document.getElementById('cNum').textContent=card.n;
+  document.getElementById('cEmoji').textContent=card.e;
+  document.getElementById('cName').textContent=card.name;
+  document.getElementById('cNameTh').textContent=card.th;
+  document.getElementById('cMean').textContent=card.m;
+  document.getElementById('pResult').classList.add('on');
+  setTimeout(()=>document.getElementById('btnAgain').classList.add('on'),1100);
+}
+
+/* ── RESET ── */
+function reset(){
+  phase='idle';
+  document.getElementById('panel').classList.remove('on');
+  document.getElementById('pIdle').style.display='';
+  document.getElementById('pResult').classList.remove('on');
+  document.getElementById('btnAgain').classList.remove('on');
+  document.getElementById('ov').classList.remove('on');
+}
+</script>
+</body>
+</html>
