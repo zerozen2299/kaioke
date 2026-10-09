@@ -11,18 +11,8 @@
 html,body{height:100%;overflow:hidden;background:var(--void);font-family:'Cinzel',serif}
 
 /* STARS */
-#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-/* ดาวใหญ่ — 4-pointed */
-.star{position:absolute;pointer-events:none;animation:tw var(--d,3s) ease-in-out infinite var(--dl,0s)}
-.star::before,.star::after{content:'';position:absolute;background:var(--gold-pale);border-radius:99px;top:50%;left:50%;transform:translate(-50%,-50%)}
-.star::before{width:100%;height:20%}.star::after{width:20%;height:100%}
-.sglow{position:absolute;inset:-80%;border-radius:50%;background:radial-gradient(circle,rgba(232,213,163,.25) 0%,transparent 70%)}
-@keyframes tw{0%,100%{opacity:.1;transform:scale(.88) rotate(0deg)}50%{opacity:var(--op,1);transform:scale(1.12) rotate(8deg)}}
-/* ดาวจุดเล็ก */
-.dot-star{position:absolute;border-radius:50%;pointer-events:none;animation:dtw var(--d,4s) ease-in-out infinite var(--dl,0s);background:var(--c,#fff);box-shadow:0 0 var(--gs,2px) var(--gc,rgba(255,255,255,.6))}
-@keyframes dtw{0%,100%{opacity:var(--mn,.15)}50%{opacity:var(--op,.95)}}
-/* nebula dust particle */
-.nebula-dot{position:absolute;border-radius:50%;pointer-events:none;animation:dtw var(--d,6s) ease-in-out infinite var(--dl,0s);filter:blur(2px)}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+#galaxyCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 
 /* FLASH */
 #flash{position:fixed;inset:0;z-index:9999;background:rgba(255,220,100,0);pointer-events:none;transition:background .15s}
@@ -205,7 +195,7 @@ html,body{height:100%;overflow:hidden;background:var(--void);font-family:'Cinzel
 </head>
 <body>
 <div id="flash"></div>
-<div id="stars"></div>
+<canvas id="galaxyCanvas"></canvas>
 <div class="rune" style="top:15%;left:5%;font-size:2rem;--dl:0s">ᚱ</div>
 <div class="rune" style="top:8%;right:6%;font-size:1.5rem;--dl:1.5s">ᛟ</div>
 <div class="rune" style="bottom:10%;left:7%;font-size:1.8rem;--dl:1s">ᛉ</div>
@@ -538,56 +528,49 @@ const CARDS=[
   {n:'XXI',name:'THE WORLD',th:'โลก',e:'🌍',m:'การสำเร็จและความสมบูรณ์ คุณมาถึงจุดสุดยอดของการเดินทาง บทเรียนทั้งหมดได้รับการเรียนรู้แล้ว'}
 ];
 
-/* STARS — galaxy style */
+/* GALAXY CANVAS */
 (function(){
-  const sl=document.getElementById('stars');
-  const starColors=['#ffffff','#e8e8ff','#c8d8ff','#ffe8c8','#ffd8e8','#d8c8ff'];
-
-  // ดาวใหญ่ 4-pointed (สีทอง/ขาว)
-  [[12,20,6],[4,10,16],[2,4,22]].forEach(([mn,mx,cnt],ti)=>{
-    for(let i=0;i<cnt;i++){
-      const d=document.createElement('div');d.className='star';
-      const sz=mn+Math.random()*(mx-mn);
-      d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*95}%;left:${Math.random()*95}%;--d:${2+Math.random()*4}s;--dl:${Math.random()*6}s;--op:${[1,.85,.6][ti]}`;
-      if(ti<2){const g=document.createElement('div');g.className='sglow';d.appendChild(g);}
-      sl.appendChild(d);
-    }
-  });
-
-  // ดาวทั่ว background — 400 ดวง หลากสี สว่างขึ้น
-  for(let i=0;i<400;i++){
-    const d=document.createElement('div');d.className='dot-star';
-    const sz=.8+Math.random()*2.5;
-    const op=.5+Math.random()*.5;
-    const col=starColors[Math.floor(Math.random()*starColors.length)];
-    const gs=sz*1.5+'px';
-    const gc=col.replace('#','rgba(').replace(/(..)(..)(..)$/,(_,r,g,b)=>`${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)},.5)`);
-    d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*5}s;--dl:${Math.random()*8}s;--op:${op};--mn:${op*.2};--c:${col};--gs:${gs};--gc:${col}44`;
-    sl.appendChild(d);
+  const cv=document.getElementById('galaxyCanvas');
+  if(!cv)return;
+  const ctx=cv.getContext('2d');
+  let W,H,stars=[],nebulas=[],sparkles=[];
+  const SC=['#ffffff','#e8f0ff','#c8d8ff','#ffeedd','#ffd8f0','#e0d0ff'];
+  const NC=[[80,40,200],[40,80,220],[160,60,140],[60,140,220],[120,80,255],[200,100,180]];
+  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;init();}
+  function init(){
+    stars=[];nebulas=[];sparkles=[];
+    for(let i=0;i<600;i++)stars.push({x:Math.random()*W,y:Math.random()*H,r:.3+Math.random()*1.6,col:SC[Math.floor(Math.random()*SC.length)],t:Math.random()*6.28,sp:.3+Math.random()*.8,base:.2+Math.random()*.55,band:false});
+    for(let i=0;i<500;i++){const p=Math.random(),cx=W*(.1+p*.8),cy=H*(.15+p*.7),sp=(Math.random()-.5)*W*.18,ox=Math.cos(-.4)*sp,oy=Math.sin(-.4)*sp;stars.push({x:cx+ox,y:cy+oy,r:.5+Math.random()*2,col:SC[Math.floor(Math.random()*SC.length)],t:Math.random()*6.28,sp:.4+Math.random(),base:.35+Math.random()*.6,band:true});}
+    for(let i=0;i<18;i++){const c=NC[Math.floor(Math.random()*NC.length)];nebulas.push({x:Math.random()*W,y:Math.random()*H,rx:80+Math.random()*160,ry:50+Math.random()*110,a:Math.random()*3.14,col:c,op:.05+Math.random()*.1,t:Math.random()*6.28,sp:.15+Math.random()*.3});}
+    for(let i=0;i<28;i++)sparkles.push({x:Math.random()*W,y:Math.random()*H,sz:3+Math.random()*9,t:Math.random()*6.28,sp:.5+Math.random()*.8,col:SC[Math.floor(Math.random()*3)]});
   }
-
-  // ดาวหนาแน่นในแนวช้างเผือก — 350 ดวง สว่างมาก
-  for(let i=0;i<350;i++){
-    const d=document.createElement('div');d.className='dot-star';
-    const t=15+Math.random()*70;
-    const spread=(Math.random()-.5)*18;
-    const left=8+(t-15)*.88+spread;
-    const sz=.7+Math.random()*2.2;
-    const op=.6+Math.random()*.4;
-    const col=starColors[Math.floor(Math.random()*starColors.length)];
-    d.style.cssText=`width:${sz}px;height:${sz}px;top:${t}%;left:${Math.min(94,Math.max(4,left))}%;--d:${2+Math.random()*5}s;--dl:${Math.random()*7}s;--op:${op};--mn:${op*.15};--c:${col};--gs:${sz*1.2}px;--gc:${col}55`;
-    sl.appendChild(d);
+  function sparkle(x,y,sz,alpha,col){
+    ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);
+    for(let i=0;i<4;i++){ctx.save();ctx.rotate(i*Math.PI/2);ctx.beginPath();ctx.moveTo(0,-sz);ctx.quadraticCurveTo(sz*.18,0,0,sz*.38);ctx.quadraticCurveTo(-sz*.18,0,0,-sz);ctx.fillStyle=col;ctx.fill();ctx.restore();}
+    const g=ctx.createRadialGradient(0,0,0,0,0,sz*3);g.addColorStop(0,col+'99');g.addColorStop(1,'transparent');ctx.beginPath();ctx.arc(0,0,sz*3,0,6.28);ctx.fillStyle=g;ctx.fill();
+    ctx.restore();
   }
-
-  // nebula dust — สว่างขึ้น
-  const nebColors=['rgba(160,90,255,.5)','rgba(80,140,255,.45)','rgba(255,120,200,.35)','rgba(100,220,255,.3)','rgba(220,160,255,.45)','rgba(255,180,100,.2)'];
-  for(let i=0;i<60;i++){
-    const d=document.createElement('div');d.className='nebula-dot';
-    const sz=4+Math.random()*8;
-    const col=nebColors[Math.floor(Math.random()*nebColors.length)];
-    d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;background:${col};--d:${4+Math.random()*7}s;--dl:${Math.random()*9}s;--op:1;--mn:.2`;
-    sl.appendChild(d);
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#080818';ctx.fillRect(0,0,W,H);
+    // milky way band
+    ctx.save();ctx.translate(W/2,H/2);ctx.rotate(-.22);ctx.translate(-W/2,-H/2);
+    const mw=ctx.createLinearGradient(0,H*.1,W,H*.9);
+    mw.addColorStop(0,'transparent');mw.addColorStop(.3,'rgba(90,55,180,.07)');mw.addColorStop(.45,'rgba(150,110,255,.16)');mw.addColorStop(.5,'rgba(180,150,255,.2)');mw.addColorStop(.55,'rgba(150,110,255,.16)');mw.addColorStop(.7,'rgba(90,55,180,.07)');mw.addColorStop(1,'transparent');
+    ctx.fillStyle=mw;ctx.fillRect(0,0,W,H);
+    const mw2=ctx.createLinearGradient(0,H*.3,W,H*.7);
+    mw2.addColorStop(0,'transparent');mw2.addColorStop(.45,'rgba(220,200,255,.05)');mw2.addColorStop(.5,'rgba(235,220,255,.12)');mw2.addColorStop(.55,'rgba(220,200,255,.05)');mw2.addColorStop(1,'transparent');
+    ctx.fillStyle=mw2;ctx.fillRect(0,0,W,H);
+    ctx.restore();
+    // nebulas
+    nebulas.forEach(n=>{n.t+=n.sp*.009;const p=Math.sin(n.t)*.012;ctx.save();ctx.translate(n.x,n.y);ctx.rotate(n.a);const g=ctx.createRadialGradient(0,0,0,0,0,n.rx);g.addColorStop(0,`rgba(${n.col},${n.op+p})`);g.addColorStop(.5,`rgba(${n.col},${(n.op+p)*.35})`);g.addColorStop(1,'transparent');ctx.scale(1,n.ry/n.rx);ctx.beginPath();ctx.arc(0,0,n.rx,0,6.28);ctx.fillStyle=g;ctx.fill();ctx.restore();});
+    // stars
+    stars.forEach(s=>{s.t+=s.sp*.011;const tw=s.base+Math.sin(s.t)*(s.band?.32:.22);const a=Math.max(0,Math.min(1,tw));if(s.r>1){const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*4.5);g.addColorStop(0,s.col+'bb');g.addColorStop(1,'transparent');ctx.beginPath();ctx.arc(s.x,s.y,s.r*4.5,0,6.28);ctx.fillStyle=g;ctx.globalAlpha=a*.45;ctx.fill();}ctx.globalAlpha=a;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.28);ctx.fillStyle=s.col;ctx.fill();ctx.globalAlpha=1;});
+    // sparkles
+    sparkles.forEach(sp=>{sp.t+=sp.sp*.014;const a=Math.max(0,.25+Math.sin(sp.t)*.75);const sz=sp.sz*(1+Math.sin(sp.t)*.12);sparkle(sp.x,sp.y,sz,a,sp.col);});
+    requestAnimationFrame(draw);
   }
+  window.addEventListener('resize',resize);resize();requestAnimationFrame(draw);
 })();
 
 /* LANDING */
