@@ -19,10 +19,10 @@ html,body{height:100%;overflow:hidden;background:var(--void);font-family:'Cinzel
 .sglow{position:absolute;inset:-80%;border-radius:50%;background:radial-gradient(circle,rgba(232,213,163,.25) 0%,transparent 70%)}
 @keyframes tw{0%,100%{opacity:.1;transform:scale(.88) rotate(0deg)}50%{opacity:var(--op,1);transform:scale(1.12) rotate(8deg)}}
 /* ดาวจุดเล็ก */
-.dot-star{position:absolute;border-radius:50%;pointer-events:none;animation:dtw var(--d,4s) ease-in-out infinite var(--dl,0s);background:var(--c,#fff)}
-@keyframes dtw{0%,100%{opacity:var(--mn,.05)}50%{opacity:var(--op,.7)}}
+.dot-star{position:absolute;border-radius:50%;pointer-events:none;animation:dtw var(--d,4s) ease-in-out infinite var(--dl,0s);background:var(--c,#fff);box-shadow:0 0 var(--gs,2px) var(--gc,rgba(255,255,255,.6))}
+@keyframes dtw{0%,100%{opacity:var(--mn,.15)}50%{opacity:var(--op,.95)}}
 /* nebula dust particle */
-.nebula-dot{position:absolute;border-radius:50%;pointer-events:none;animation:dtw var(--d,6s) ease-in-out infinite var(--dl,0s);filter:blur(1.5px)}
+.nebula-dot{position:absolute;border-radius:50%;pointer-events:none;animation:dtw var(--d,6s) ease-in-out infinite var(--dl,0s);filter:blur(2px)}
 
 /* FLASH */
 #flash{position:fixed;inset:0;z-index:9999;background:rgba(255,220,100,0);pointer-events:none;transition:background .15s}
@@ -59,24 +59,25 @@ html,body{height:100%;overflow:hidden;background:var(--void);font-family:'Cinzel
 
 /* APP */
 #app{position:fixed;inset:0;z-index:1;background:#080818;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 1s ease .35s;overflow:hidden}
-/* milky way band */
+/* milky way band — สว่างชัดเจน */
 #app::before{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  content:'';position:absolute;inset:-30%;pointer-events:none;z-index:0;
   background:
-    radial-gradient(ellipse 120% 35% at 55% 55%, rgba(120,80,200,.18) 0%, transparent 60%),
-    radial-gradient(ellipse 80% 20% at 40% 50%, rgba(180,140,255,.12) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 15% at 60% 52%, rgba(255,200,120,.08) 0%, transparent 50%),
-    radial-gradient(ellipse 200% 8% at 50% 53%, rgba(200,180,255,.1) 0%, transparent 100%);
-  transform:rotate(-25deg);
+    radial-gradient(ellipse 180% 22% at 52% 52%, rgba(160,110,255,.55) 0%, rgba(120,80,220,.3) 30%, transparent 65%),
+    radial-gradient(ellipse 120% 14% at 48% 50%, rgba(200,170,255,.4) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 10% at 55% 53%, rgba(255,220,180,.15) 0%, transparent 50%);
+  transform:rotate(-22deg);
+  mix-blend-mode:screen;
 }
-/* nebula glow patches */
+/* nebula glow patches — สว่างขึ้น */
 #app::after{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
   background:
-    radial-gradient(ellipse 30% 25% at 20% 30%, rgba(80,40,160,.15) 0%, transparent 70%),
-    radial-gradient(ellipse 25% 20% at 80% 70%, rgba(40,80,180,.12) 0%, transparent 70%),
-    radial-gradient(ellipse 20% 15% at 70% 20%, rgba(160,60,120,.1) 0%, transparent 70%),
-    radial-gradient(ellipse 15% 12% at 15% 75%, rgba(60,120,200,.1) 0%, transparent 70%);
+    radial-gradient(ellipse 35% 28% at 18% 25%, rgba(100,50,200,.35) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 22% at 82% 72%, rgba(50,90,220,.3) 0%, transparent 70%),
+    radial-gradient(ellipse 25% 18% at 72% 18%, rgba(180,70,140,.25) 0%, transparent 70%),
+    radial-gradient(ellipse 20% 15% at 12% 78%, rgba(60,140,220,.25) 0%, transparent 70%),
+    radial-gradient(ellipse 18% 14% at 88% 30%, rgba(120,200,255,.15) 0%, transparent 70%);
 }
 #app.on{opacity:1;pointer-events:all}
 .app-title{font-family:'Cinzel Decorative',serif;font-size:clamp(.85rem,2.2vw,1.4rem);color:var(--gold);letter-spacing:.2em;text-align:center;text-shadow:0 0 28px rgba(201,169,110,.28);margin-bottom:.1rem}
@@ -572,37 +573,38 @@ const CARDS=[
     }
   });
 
-  // ดาวจุดทั่ว background — 300 ดวง หลากสี
-  for(let i=0;i<300;i++){
+  // ดาวทั่ว background — 400 ดวง หลากสี สว่างขึ้น
+  for(let i=0;i<400;i++){
     const d=document.createElement('div');d.className='dot-star';
-    const sz=.6+Math.random()*2;
-    const op=.2+Math.random()*.7;
+    const sz=.8+Math.random()*2.5;
+    const op=.5+Math.random()*.5;
     const col=starColors[Math.floor(Math.random()*starColors.length)];
-    d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*7}s;--dl:${Math.random()*9}s;--op:${op};--mn:${op*.1};--c:${col}`;
+    const gs=sz*1.5+'px';
+    const gc=col.replace('#','rgba(').replace(/(..)(..)(..)$/,(_,r,g,b)=>`${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)},.5)`);
+    d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*5}s;--dl:${Math.random()*8}s;--op:${op};--mn:${op*.2};--c:${col};--gs:${gs};--gc:${col}44`;
     sl.appendChild(d);
   }
 
-  // ดาวหนาแน่นในแนวช้างเผือก (เฉียง ~25deg ผ่านกลางจอ)
-  for(let i=0;i<200;i++){
+  // ดาวหนาแน่นในแนวช้างเผือก — 350 ดวง สว่างมาก
+  for(let i=0;i<350;i++){
     const d=document.createElement('div');d.className='dot-star';
-    // กระจายในแนวเฉียงผ่านกลาง
-    const t=20+Math.random()*60; // 20-80% vertical
-    const spread=(Math.random()-.5)*22; // ±22% จากแกน
-    const left=10+(t-20)*.9+spread; // เฉียงจากซ้ายบนไปขวาล่าง
-    const sz=.5+Math.random()*1.8;
-    const op=.25+Math.random()*.65;
+    const t=15+Math.random()*70;
+    const spread=(Math.random()-.5)*18;
+    const left=8+(t-15)*.88+spread;
+    const sz=.7+Math.random()*2.2;
+    const op=.6+Math.random()*.4;
     const col=starColors[Math.floor(Math.random()*starColors.length)];
-    d.style.cssText=`width:${sz}px;height:${sz}px;top:${t}%;left:${Math.min(95,Math.max(5,left))}%;--d:${3+Math.random()*6}s;--dl:${Math.random()*8}s;--op:${op};--mn:${op*.08};--c:${col}`;
+    d.style.cssText=`width:${sz}px;height:${sz}px;top:${t}%;left:${Math.min(94,Math.max(4,left))}%;--d:${2+Math.random()*5}s;--dl:${Math.random()*7}s;--op:${op};--mn:${op*.15};--c:${col};--gs:${sz*1.2}px;--gc:${col}55`;
     sl.appendChild(d);
   }
 
-  // nebula dust — blur จาง ม่วง/ฟ้า/ชมพู
-  const nebColors=['rgba(140,80,255,.25)','rgba(60,120,255,.2)','rgba(255,100,180,.18)','rgba(80,200,255,.15)','rgba(200,140,255,.2)'];
-  for(let i=0;i<40;i++){
+  // nebula dust — สว่างขึ้น
+  const nebColors=['rgba(160,90,255,.5)','rgba(80,140,255,.45)','rgba(255,120,200,.35)','rgba(100,220,255,.3)','rgba(220,160,255,.45)','rgba(255,180,100,.2)'];
+  for(let i=0;i<60;i++){
     const d=document.createElement('div');d.className='nebula-dot';
-    const sz=3+Math.random()*6;
+    const sz=4+Math.random()*8;
     const col=nebColors[Math.floor(Math.random()*nebColors.length)];
-    d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;background:${col};--d:${5+Math.random()*8}s;--dl:${Math.random()*10}s;--op:1;--mn:.1`;
+    d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;background:${col};--d:${4+Math.random()*7}s;--dl:${Math.random()*9}s;--op:1;--mn:.2`;
     sl.appendChild(d);
   }
 })();
