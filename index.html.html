@@ -59,26 +59,7 @@ html,body{height:100%;overflow:hidden;background:var(--void);font-family:'Cinzel
 
 /* APP */
 #app{position:fixed;inset:0;z-index:1;background:#080818;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 1s ease .35s;overflow:hidden}
-/* milky way band — สว่างชัดเจน */
-#app::before{
-  content:'';position:absolute;inset:-30%;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 180% 22% at 52% 52%, rgba(160,110,255,.55) 0%, rgba(120,80,220,.3) 30%, transparent 65%),
-    radial-gradient(ellipse 120% 14% at 48% 50%, rgba(200,170,255,.4) 0%, transparent 55%),
-    radial-gradient(ellipse 100% 10% at 55% 53%, rgba(255,220,180,.15) 0%, transparent 50%);
-  transform:rotate(-22deg);
-  mix-blend-mode:screen;
-}
-/* nebula glow patches — สว่างขึ้น */
-#app::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 35% 28% at 18% 25%, rgba(100,50,200,.35) 0%, transparent 70%),
-    radial-gradient(ellipse 30% 22% at 82% 72%, rgba(50,90,220,.3) 0%, transparent 70%),
-    radial-gradient(ellipse 25% 18% at 72% 18%, rgba(180,70,140,.25) 0%, transparent 70%),
-    radial-gradient(ellipse 20% 15% at 12% 78%, rgba(60,140,220,.25) 0%, transparent 70%),
-    radial-gradient(ellipse 18% 14% at 88% 30%, rgba(120,200,255,.15) 0%, transparent 70%);
-}
+
 #app.on{opacity:1;pointer-events:all}
 .app-title{font-family:'Cinzel Decorative',serif;font-size:clamp(.85rem,2.2vw,1.4rem);color:var(--gold);letter-spacing:.2em;text-align:center;text-shadow:0 0 28px rgba(201,169,110,.28);margin-bottom:.1rem}
 .app-sub{font-family:'Sarabun',sans-serif;font-weight:300;font-size:.65rem;color:rgba(201,169,110,.4);letter-spacing:.22em;text-align:center;margin-bottom:1rem}
